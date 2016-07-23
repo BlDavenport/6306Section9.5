@@ -1,0 +1,70 @@
+---
+title: "LiveSession9BlakeDavenport"
+author: "Blake Davenport"
+date: "July 18, 2016"
+output: html_document
+keep_md: true
+---
+```{r}
+library(fpp)
+```
+
+#Plot the time series. Can you identify seasonal fluctuations and/or a trend? 
+
+```{r}
+data("ukcars")
+plot(ukcars)
+```
+
+##Yes. There is a definate pattern to the sinewave, and a growth trend over time (which closely mirrors the economic growth for that time).
+
+#Use a classical decomposition to calculate the trend-cycle and seasonal indices. 
+
+```{r}
+fitd <- decompose(ukcars)
+plot(fitd)
+```
+
+#Do the results support the graphical interpretation from part (a)? 
+
+##Yes. The basic trend is still present 
+
+#Compute and plot the seasonally adjusted data. 
+
+```{r}
+ukcarsadj <- seasadj(fitd)
+plot(ukcarsadj)
+```
+
+##Change one observation to be an outlier (e.g., add 500 to one observation), and recompute the seasonally adjusted data. What is the effect of the outlier? 
+
+```{r}
+ukcarsv1<-ts(c(ukcars[1:54],ukcars[55]+200,ukcars, ukcars[56:191]), start=c(1977,1), frequency=12)
+fitd1 <- decompose(ukcarsv1)
+ukcarsadj1 <- seasadj(fitd1)
+plot(fitd1)
+```
+
+#Does it make any difference if the outlier is near the end rather than in the middle of the time series? 
+
+```{r}
+ukcarsv2<-ts(c(ukcars[1:100],ukcars[101]+200,ukcars, ukcars[102:191]), start=c(1977,1), frequency=12)
+fitd2 <- decompose(ukcarsv2)
+ukcarsadj2 <- seasadj(fitd2)
+plot(fitd2)
+```
+
+##It spiked the data locally, but did not affect the overall trend
+
+#Now use STL to decompose the series. Does the outlier have the same effect with STL?
+
+```{r}
+fit <- stl(ukcars, s.window=5)
+plot(fit)
+plot(ukcars, col="gray",
+  main="Year",
+  ylab="Cars Sold", xlab="")
+lines(fit$time.series[,2],col="red",ylab="Trend")
+```
+
+##There is still a similar trend
